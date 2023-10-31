@@ -9,6 +9,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sensors_plus/sensors_plus.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:syncfusion_flutter_charts/sparkcharts.dart';
 
 // import 'snake.dart';
 
@@ -50,34 +52,61 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  
   List<double>? _magnetometerValues;
+  double? magx;
+  double? magy;
+  double? magz;
   final _streamSubscriptions = <StreamSubscription<dynamic>>[];
+  List<double> xValues = [];
 
   @override
   Widget build(BuildContext context) {
-    
     final magnetometer =
         _magnetometerValues?.map((double v) => v.toStringAsFixed(1)).toList();
-
+    final magxs = magx?.toStringAsFixed(1);
+    final magys = magy?.toStringAsFixed(1);
+    final magzs = magz?.toStringAsFixed(1);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Sensors Plus Example'),
         elevation: 4,
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      body: ListView(
+        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-         
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Row(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Text('Magnetometer: $magnetometer'),
+                Text('x: $magxs'),
+                Text('y: $magys'),
+                Text('z: $magzs'),
+                Text('z: $xValues'),
               ],
             ),
           ),
+
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SfSparkLineChart(
+              data: xValues,
+            ),
+          ),
+          // Container(
+          //     child: SfCartesianChart(
+          //   primaryXAxis: NumericAxis(),
+          //   primaryYAxis: NumericAxis(),
+          //   series: <ColumnSeries<String, num>>[
+          //     ColumnSeries<String, num>(
+          //       dataSource: chartData,
+          //       xValueMapper: (ChartSampleData data, _) => data.x,
+          //       yValueMapper: (ChartSampleData data, _) => data.y,
+          //       dataLabelSettings: DataLabelSettings(isVisible: true)
+          //     ),
+          //   ],
+          // )),
         ],
       ),
     );
@@ -91,16 +120,30 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  void addValue(double value) {
+    if (xValues.length >= 10) {
+      xValues.removeAt(0); // Remove the first (oldest) element
+    }
+    xValues.add(value);
+  }
+
   @override
   void initState() {
     super.initState();
-    
-  
+
     _streamSubscriptions.add(
       magnetometerEvents.listen(
         (MagnetometerEvent event) {
           setState(() {
             _magnetometerValues = <double>[event.x, event.y, event.z];
+            magx = event.x;
+            magy = event.y;
+            magz = event.z;
+            addValue(event.x);
+            if (xValues.length >= 10) {
+              xValues.removeAt(0); // Remove the first (oldest) element
+            }
+            xValues.add(event.x);
           });
         },
         onError: (e) {
