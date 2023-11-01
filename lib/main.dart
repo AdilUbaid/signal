@@ -58,6 +58,8 @@ class _MyHomePageState extends State<MyHomePage> {
   double? magz;
   final _streamSubscriptions = <StreamSubscription<dynamic>>[];
   List<double> xValues = [];
+  List<double> yValues = [];
+  List<double> zValues = [];
 
   @override
   Widget build(BuildContext context) {
@@ -83,30 +85,55 @@ class _MyHomePageState extends State<MyHomePage> {
                 Text('x: $magxs'),
                 Text('y: $magys'),
                 Text('z: $magzs'),
-                Text('z: $xValues'),
+                Text('z: $yValues'),
               ],
             ),
           ),
-
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: SfSparkLineChart(
-              data: xValues,
+            // child: SingleChildScrollView(
+            // scrollDirection: Axis.horizontal,
+            child: Container(
+              width: double.infinity,
+              child: SfSparkLineChart(
+                // trackball: SparkChartTrackball(),
+                // highPointColor: Colors.red,
+                labelDisplayMode: SparkChartLabelDisplayMode.all,
+                // marker: SparkChartMarker(),
+                data: xValues,
+              ),
             ),
           ),
-          // Container(
-          //     child: SfCartesianChart(
+          // SfCartesianChart(
           //   primaryXAxis: NumericAxis(),
-          //   primaryYAxis: NumericAxis(),
-          //   series: <ColumnSeries<String, num>>[
-          //     ColumnSeries<String, num>(
-          //       dataSource: chartData,
-          //       xValueMapper: (ChartSampleData data, _) => data.x,
-          //       yValueMapper: (ChartSampleData data, _) => data.y,
-          //       dataLabelSettings: DataLabelSettings(isVisible: true)
-          //     ),
-          //   ],
-          // )),
+          //   title: ChartTitle(text: "x axis"),
+          //   series: xValues,
+          // )
+          // ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+             child: Container(
+              width: double.infinity,
+              child: SfSparkLineChart(
+                highPointColor: Colors.red,
+                labelDisplayMode: SparkChartLabelDisplayMode.all,
+                // marker: SparkChartMarker(),
+                data: yValues,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              width: double.infinity,
+              child: SfSparkLineChart(
+                highPointColor: Colors.red,
+                labelDisplayMode: SparkChartLabelDisplayMode.all,
+                // marker: SparkChartMarker(),
+                data: zValues,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -120,11 +147,11 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void addValue(double value) {
-    if (xValues.length >= 10) {
-      xValues.removeAt(0); // Remove the first (oldest) element
+  void addValue(double value, List<double> array) {
+    if (array.length >= 10) {
+      array.removeAt(0); // Remove the first (oldest) element
     }
-    xValues.add(value);
+    array.add(value);
   }
 
   @override
@@ -139,11 +166,13 @@ class _MyHomePageState extends State<MyHomePage> {
             magx = event.x;
             magy = event.y;
             magz = event.z;
-            addValue(event.x);
-            if (xValues.length >= 10) {
-              xValues.removeAt(0); // Remove the first (oldest) element
-            }
-            xValues.add(event.x);
+            addValue(event.x, xValues);
+            addValue(event.y, yValues);
+            addValue(event.z, zValues);
+            // if (xValues.length >= 10) {
+            //   xValues.removeAt(0); // Remove the first (oldest) element
+            // }
+            // xValues.add(event.x);
           });
         },
         onError: (e) {
