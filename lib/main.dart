@@ -1,11 +1,12 @@
 import 'dart:async';
+import 'dart:developer';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:syncfusion_flutter_charts/sparkcharts.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,6 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<double> xValues = [];
   List<double> yValues = [];
   List<double> zValues = [];
+  List<double> fieldValues = [];
 
   @override
   Widget build(BuildContext context) {
@@ -80,36 +82,26 @@ class _MyHomePageState extends State<MyHomePage> {
                     Text('y: $magys'),
                     Text('z: $magzs'),
                     // Text('z: $yValues'),
+                    Text("$fieldValues")
                   ],
                 ),
               ),
-              // Padding(
-              //   padding: const EdgeInsets.all(8.0),
-              //   // child: SingleChildScrollView(
-              //   // scrollDirection: Axis.horizontal,
-              //   child: Container(
-              //     width: double.infinity,
-              //     child: SfSparkLineChart(
-              //       // color: Colors.red,
-              //       // trackball: SparkChartTrackball(
-              //       // activationMode: SparkChartActivationMode.tap),
-              //       labelDisplayMode: SparkChartLabelDisplayMode.all,
-              //       // marker: SparkChartMarker(
-              //       // displayMode: SparkChartMarkerDisplayMode.high),
-
-              //       data: xValues,
-              //     ),
-              //   ),
-              // ),
-              // Center(child: Text("X axis")),
               xValues.isEmpty
                   ? const CircularProgressIndicator()
                   : LiveChart(xValues, const []),
               const Center(child: Text("X axis")),
-              LiveChart(yValues, const []),
+              xValues.isEmpty
+                  ? const CircularProgressIndicator()
+                  : LiveChart(yValues, const []),
               const Center(child: Text("Y axis")),
-              LiveChart(zValues, const []),
+              xValues.isEmpty
+                  ? const CircularProgressIndicator()
+                  : LiveChart(zValues, const []),
               const Center(child: Text("Z axis")),
+              fieldValues.isEmpty
+                  ? const CircularProgressIndicator()
+                  : LiveChart(fieldValues, const []),
+              const Center(child: Text("magnetic field")),
             ],
           );
         }));
@@ -125,10 +117,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void addValue(double value, List<double> array) {
     if (array.length >= 10) {
-      array.removeAt(0); // Remove the first (oldest) element
+      array.removeAt(0);
     }
     array.add(value);
     setState(() {});
+  }
+
+  calculateMagneticField(double x, double y, double z) {
+    // Calculate the magnitude using the Pythagorean theorem
+    double field = sqrt((x * x) + (y * y) + (z * z));
+    // print("HElLLO");
+    print(field.toString());
+    addValue(field, fieldValues);
   }
 
   @override
@@ -143,9 +143,12 @@ class _MyHomePageState extends State<MyHomePage> {
             magx = event.x;
             magy = event.y;
             magz = event.z;
+            // print("BEFORE CALL");
             addValue(event.x, xValues);
             addValue(event.y, yValues);
             addValue(event.z, zValues);
+            
+            calculateMagneticField(magx!, magy!, magz!);
           });
         },
         onError: (e) {
