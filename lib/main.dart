@@ -1,13 +1,12 @@
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_charts/sparkcharts.dart';
 
-// import 'snake.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -64,74 +63,89 @@ class _MyHomePageState extends State<MyHomePage> {
     final magys = magy?.toStringAsFixed(1);
     final magzs = magz?.toStringAsFixed(1);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sensors Plus Example'),
-        elevation: 4,
-      ),
-      body: ListView(
-        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text('Magnetometer: $magnetometer'),
-                Text('x: $magxs'),
-                Text('y: $magys'),
-                Text('z: $magzs'),
-                Text('z: $yValues'),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            // child: SingleChildScrollView(
-            // scrollDirection: Axis.horizontal,
-            child: Container(
-              width: double.infinity,
-              child: SfSparkLineChart(
-                // trackball: SparkChartTrackball(),
-                // highPointColor: Colors.red,
-                labelDisplayMode: SparkChartLabelDisplayMode.all,
-                // marker: SparkChartMarker(),
-                data: xValues,
+        appBar: AppBar(
+          title: const Text('Sensors Plus Example'),
+          elevation: 4,
+        ),
+        body: Builder(builder: (context) {
+          return ListView(
+            // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text('Magnetometer: $magnetometer'),
+                    Text('x: $magxs'),
+                    Text('y: $magys'),
+                    Text('z: $magzs'),
+                    // Text('z: $yValues'),
+                  ],
+                ),
               ),
-            ),
-          ),
-          // SfCartesianChart(
-          //   primaryXAxis: NumericAxis(),
-          //   title: ChartTitle(text: "x axis"),
-          //   series: xValues,
-          // )
-          // ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-             child: Container(
-              width: double.infinity,
-              child: SfSparkLineChart(
-                highPointColor: Colors.red,
-                labelDisplayMode: SparkChartLabelDisplayMode.all,
-                // marker: SparkChartMarker(),
-                data: yValues,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              width: double.infinity,
-              child: SfSparkLineChart(
-                highPointColor: Colors.red,
-                labelDisplayMode: SparkChartLabelDisplayMode.all,
-                // marker: SparkChartMarker(),
-                data: zValues,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   // child: SingleChildScrollView(
+              //   // scrollDirection: Axis.horizontal,
+              //   child: Container(
+              //     width: double.infinity,
+              //     child: SfSparkLineChart(
+              //       // color: Colors.red,
+              //       // trackball: SparkChartTrackball(
+              //       // activationMode: SparkChartActivationMode.tap),
+              //       labelDisplayMode: SparkChartLabelDisplayMode.all,
+              //       // marker: SparkChartMarker(
+              //       // displayMode: SparkChartMarkerDisplayMode.high),
+
+              //       data: xValues,
+              //     ),
+              //   ),
+              // ),
+              // Center(child: Text("X axis")),
+              LiveChart(xValues, yValues),
+              Center(child: Text("X axis")),
+              LiveChart(yValues, yValues),
+              Center(child: Text("Y axis")),
+              LiveChart(zValues, yValues),
+              Center(child: Text("Z axis")),
+              // SfCartesianChart(
+              //   primaryXAxis: NumericAxis(),
+              //   title: ChartTitle(text: "x axis"),
+              //   series: xValues,
+              // )
+              // ),
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: Container(
+              //     width: double.infinity,
+              //     child: SfSparkLineChart(
+              //       labelDisplayMode: SparkChartLabelDisplayMode.all,
+              //       // trackball: SparkChartTrackball(),
+              //       data: yValues,
+              //     ),
+              //   ),
+              // ),
+              // Center(child: Text("Y axis")),
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: Container(
+              //     width: double.infinity,
+              //     child: SingleChildScrollView(
+              //       scrollDirection: Axis.horizontal,
+              //       child: SfSparkLineChart(
+              //         // highPointColor: Colors.red,
+              //         labelDisplayMode: SparkChartLabelDisplayMode.all,
+              //         // marker: SparkChartMarker(),
+              //         data: zValues,
+              //       ),
+              //     ),
+              //   ),
+              // ),
+              // Center(child: Text("Z axis")),
+            ],
+          );
+        }));
   }
 
   @override
@@ -147,6 +161,7 @@ class _MyHomePageState extends State<MyHomePage> {
       array.removeAt(0); // Remove the first (oldest) element
     }
     array.add(value);
+    setState(() {});
   }
 
   @override
@@ -164,10 +179,6 @@ class _MyHomePageState extends State<MyHomePage> {
             addValue(event.x, xValues);
             addValue(event.y, yValues);
             addValue(event.z, zValues);
-            // if (xValues.length >= 10) {
-            //   xValues.removeAt(0); // Remove the first (oldest) element
-            // }
-            // xValues.add(event.x);
           });
         },
         onError: (e) {
@@ -185,4 +196,43 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
+
+class LiveChart extends StatefulWidget {
+  final List<double> xValues;
+  final List<double> yValues;
+
+  LiveChart(this.xValues, this.yValues);
+
+  @override
+  _LiveChartState createState() => _LiveChartState();
+}
+
+class _LiveChartState extends State<LiveChart> {
+  @override
+  Widget build(BuildContext context) {
+    return SfCartesianChart(
+      // Define your chart configuration here
+      primaryXAxis: NumericAxis(),
+      primaryYAxis: NumericAxis(),
+      series: <LineSeries<ChartData, double>>[
+        LineSeries<ChartData, double>(
+          dataSource: widget.xValues
+              .asMap()
+              .entries
+              .map((entry) => ChartData(entry.key.toDouble(), entry.value))
+              .toList(),
+          xValueMapper: (ChartData chartData, _) => chartData.x,
+          yValueMapper: (ChartData chartData, _) => chartData.y,
+        ),
+      ],
+    );
+  }
+}
+
+class ChartData {
+  final double x;
+  final double y;
+
+  ChartData(this.x, this.y);
 }
