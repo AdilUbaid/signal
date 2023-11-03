@@ -7,7 +7,6 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_charts/sparkcharts.dart';
 
-
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations(
@@ -103,46 +102,14 @@ class _MyHomePageState extends State<MyHomePage> {
               //   ),
               // ),
               // Center(child: Text("X axis")),
-              LiveChart(xValues, yValues),
-              Center(child: Text("X axis")),
-              LiveChart(yValues, yValues),
-              Center(child: Text("Y axis")),
-              LiveChart(zValues, yValues),
-              Center(child: Text("Z axis")),
-              // SfCartesianChart(
-              //   primaryXAxis: NumericAxis(),
-              //   title: ChartTitle(text: "x axis"),
-              //   series: xValues,
-              // )
-              // ),
-              // Padding(
-              //   padding: const EdgeInsets.all(8.0),
-              //   child: Container(
-              //     width: double.infinity,
-              //     child: SfSparkLineChart(
-              //       labelDisplayMode: SparkChartLabelDisplayMode.all,
-              //       // trackball: SparkChartTrackball(),
-              //       data: yValues,
-              //     ),
-              //   ),
-              // ),
-              // Center(child: Text("Y axis")),
-              // Padding(
-              //   padding: const EdgeInsets.all(8.0),
-              //   child: Container(
-              //     width: double.infinity,
-              //     child: SingleChildScrollView(
-              //       scrollDirection: Axis.horizontal,
-              //       child: SfSparkLineChart(
-              //         // highPointColor: Colors.red,
-              //         labelDisplayMode: SparkChartLabelDisplayMode.all,
-              //         // marker: SparkChartMarker(),
-              //         data: zValues,
-              //       ),
-              //     ),
-              //   ),
-              // ),
-              // Center(child: Text("Z axis")),
+              xValues.isEmpty
+                  ? const CircularProgressIndicator()
+                  : LiveChart(xValues, const []),
+              const Center(child: Text("X axis")),
+              LiveChart(yValues, const []),
+              const Center(child: Text("Y axis")),
+              LiveChart(zValues, const []),
+              const Center(child: Text("Z axis")),
             ],
           );
         }));
